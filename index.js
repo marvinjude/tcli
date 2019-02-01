@@ -1,46 +1,30 @@
-#!/usr/bin/env node
-
-const yargs = require("yargs");
+const program = require("commander");
 const handler = require("./lib/handler")
-const terminalWidth = yargs.terminalWidth();
+const color = require("colors");
 
-yargs
-  .usage("$0 <cmd> [args]")
-  .option("f", {
-    alias: "full",
-    demandOption: true,
-    default: false,
-    describe: "Specifies if full details should be fetched",
-    type: "boolean"
-  })
-  .option("to-file", {
-    alias: "tf",
-    demandOption: true,
-    default: false,
-    describe: "Specifies if file should be created with user data",
-    type: "boolean"
-  })
-  .demandOption(
-    ["username"],
-    `Please provide the <username> of the user you want to fetch \n
-     For Example: 
-     \t trieve marvinjudehk
-    `
-  ) /** Username is required */
-  .command(
-    "$0 [username]",
-    "Trieve - retrieve a twitter user's data!",
-    yargs => {
-      yargs.positional("--username", {
-        type: "string",
-        alias: "u",
-        describe: "The username of the twitter user whose details is to be retrieved"
-      });
-    },
-    /**Also pass terminal width to handler */
-    (argv) => handler({
-      argv,
-      terminalWidth
-    })
-  )
-  .help().argv;
+
+program
+  .command("get <username> [otherUserNames...]")
+  .description("Fetch data for specified user or users ")
+  .alias("g")
+  .option("-tf, --to-file", "Create file with user data")
+  .option("-f, --full", "Fetch full details")
+  .action(handler)
+  .on("--help", function() {
+    console.log("");
+    console.log("Examples:");
+    console.log("");
+    console.log(`  $ trieve get ${color.yellow.bold("marvinjudek")}`);
+    console.log(`  $ trieve get ${color.yellow.bold("marvinjudek kvng_zeez")}`);
+    console.log("");
+    console.log("  Create File with data:");
+    console.log("");
+    console.log(`  $ trieve get ${color.yellow.bold("marvinjudek")} -tf`);
+    console.log(`  $ trieve get ${color.yellow.bold("marvinjudek kvng_zeez")} -tf`);
+  });
+
+program.command("search <username> ").action(function() {
+  console.log("Coming soon!!");
+});
+
+program.parse(process.argv);
